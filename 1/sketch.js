@@ -27,51 +27,58 @@ of code to draw then you've probably over done it.
 
 function setup()
 {
-	createCanvas(1024, 576);
+//	createCanvas(1024, 576);
+    createCanvas(window.innerWidth, window.innerHeight);
+}
+
+// clouds color 158, 238, 224
+
+function getClouds() {
+    fill(224,224,224);
+    ellipse(90, 120, 85, 70);
+    ellipse(150, 130, 100, 90);
+    ellipse(220, 120, 150, 70);
+    
+    ellipse(500, 120, 85, 70);
+    ellipse(520, 120, 130, 70);
+    
+    ellipse(880, 120, 85, 70);
+    ellipse(950, 130, 100, 90);
 }
 
 function draw()
 {
-	background(100, 155, 255); //fill the sky blue
+	background(100, 130, 255); //fill the sky blue
 
 	noStroke();
+//    grass
 	fill(0,155,0);
-	rect(0, 432, 1024, 144); //draw some green ground
+	rect(0, 550, window.innerWidth, 2000);
 
-	//1. a cloud in the sky
-	//... add your code here
+    getClouds();
 
-	noStroke();
-	fill(255);
-	text("cloud", 200, 100);
+//    Mountain
+    fill(121,85,72);
+    triangle(500, 550, 800, 550, 650, 250);
 
-	//2. a mountain in the distance
-	//... add your code here
+    
+//	Tree    
+    fill(120, 100, 40);
+    rect(1200, 400, 60, 150);
 
-	noStroke();
-	fill(255);
-	text("mountain", 500, 256);
+    fill(0, 155, 0);
+    triangle(1100, 400, 1350, 400, 1225, 200);
+    triangle(1100, 350, 1350, 350, 1225, 150);
+    triangle(1100, 300, 1350, 300, 1225, 100);
+    
+//  Canyon
+    fill(0,0,0);
+    rect(100,550,100,500);
 
-	//3. a tree
-	//... add your code here
 
-	noStroke();
-	fill(255);
-	text("tree", 800, 346);
-
-	//4. a canyon
-	//NB. the canyon should go from ground-level to the bottom of the screen
-
-	//... add your code here
-
-	noStroke();
-	fill(255);
-	text("canyon", 100, 480);
-
-	//5. a collectable token - eg. a jewel, fruit, coins
-	//... add your code here
-
-	noStroke();
-	fill(255);
-	text("collectable item", 400, 400);
+//  Collectible
+    fill(255,235,59);
+    ellipse(300,500,30,30);
+    fill(0);
+    text("C",295,503);
 }
