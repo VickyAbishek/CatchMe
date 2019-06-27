@@ -18,6 +18,7 @@ var isFalling = false;
 var isPlummeting = false;
 var isRight = false;
 var isJumping = false;
+var isFound = false;
 
 function setup()
 {
@@ -25,6 +26,34 @@ function setup()
 	floorPos_y = height * 3/4;
 	gameChar_x = width/2;
 	gameChar_y = floorPos_y;
+    
+    canyon = {
+        x_pos: 100,
+        width: 100,
+        height: 500
+    }
+    
+    collectable = {
+        x_pos: canyon.x_pos + 50,
+        y_pos: floorPos_y-100,
+        size: 5,
+        length: 15,
+        isFound: false
+    }
+    
+//    mountain = {
+//        startingBase: treePos_x-150,
+//        y_pos: floorPos_y,
+//        endingBase: treePos_x+300
+//    }
+}
+
+function isGrounded() {
+    var result = false;
+    if( gameChar_y === floorPos_y ) {
+        return true;
+    }
+    return result;
 }
 
 function draw()
@@ -34,28 +63,58 @@ function draw()
 
 	background(100,155,255); //fill the sky blue
 
-
 	noStroke();
+//    stroke(0,0,0);
 	fill(0,155,0);
 	rect(0, floorPos_y, width, height - floorPos_y); //draw some green ground
 
 	//draw the canyon
-
+    fill(160,82,45);
+    rect(canyon.x_pos,floorPos_y,canyon.width,canyon.height);
+    
+    
+    checkPlummeting();
 
 	//the game character
 	if(isLeft && isFalling)
 	{
+        if( isGrounded() ) isFalling=false;
+        
 		// add your jumping-left code
-
+        stroke(0,0,0);
+        getJumpingHands();
+        getSideHead("left");
+        getJumpingBody();
+        if(gameChar_y )
+        getJumpingSideLegs("left");
+        if( gameChar_x != 20 && gameChar_x > 20 )
+        {
+            gameChar_x -= 5;
+        }
 	}
 	else if(isRight && isFalling)
 	{
+        if( isGrounded() ) isFalling=false;
+        
 		// add your jumping-right code
-
+        stroke(0,0,0);
+        getJumpingHands();
+        getSideHead("right");
+        getJumpingBody();
+        if( isGrounded() ) {
+            getSideLegs();
+        }else {
+            getJumpingSideLegs("right");    
+        }
+        
+        if( gameChar_x != width-20 && gameChar_x < width-20 )
+        {
+            gameChar_x += 5;
+        }
 	}
 	else if(isLeft)
 	{
-		// add your walking left code
+ 		// add your walking left code
         stroke(0,0,0);
         getSideHead("left");
         getSideBody();
@@ -63,35 +122,31 @@ function draw()
         getSideLegs();
         if( gameChar_x != 20 && gameChar_x > 20 )
         {
-            gameChar_x -= 5;    
+            gameChar_x -= 5;
         }
-            
-
 	}
 	else if(isRight)
 	{
 		// add your walking right code
+        
         stroke(0,0,0);
         getSideHead("right");
         getSideBody();
         getSideHands();
         getSideLegs();
-        console.log("width" + width + " " + gameChar_x );
         if( gameChar_x != width-20 && gameChar_x < width-20 )
+        {
             gameChar_x += 5;
-
+        }
 	}
 	else if(isFalling || isPlummeting)
 	{
 		// add your jumping facing forwards code
-        console.log("character falling fallig down")
         stroke(0,0,0);
         getBody();
         getHead();
         getJumpingHands();
         getJumpingLegs();
-        isFalling = false;
-
 	}
 	else
 	{
@@ -101,29 +156,63 @@ function draw()
         getHead();
         getLegs();
         getHands();
-
 	}
     
     
 
 	///////////INTERACTION CODE//////////
 	//Put conditional statements to move the game character below here
-    if( floorPos_y != gameChar_y ) {
-        if( gameChar_y === floorPos_y ) {
-            isFalling = false;
-        }else {
-            gameChar_y += 5;
-            isFalling = true;
-        }
-    } else if(isJumping) {
-        if( gameChar_y === floorPos_y )
-        {
-            gameChar_y -= 50;
-        }
-    }
+    
+    
+//    Disected into several functions, to avoid clumpy code
+    fallingDown();
+    jumpCharacter();
+    displayCollectable();
 
 }
 
+function checkPlummeting() {
+    if( gameChar_x >= canyon.x_pos && 
+       gameChar_x <= canyon.x_pos+canyon.width &&
+       gameChar_y == floorPos_y) {
+        isPlummeting = true;
+    } else {
+        isPlummeting = false;
+    }
+}
+
+function displayCollectable() {
+    if( !collectable.isFound ) {
+        getCollectable();
+    }
+    
+    if( abs(gameChar_x-collectable.x_pos) <= 25 && abs(gameChar_y-collectable.y_pos) <= 55) {
+        collectable.isFound = true;
+    }
+}
+
+function jumpCharacter() {
+    if(isJumping) {
+        if( gameChar_y === floorPos_y )
+        {
+            gameChar_y -= 80;
+        }   
+    }
+}
+
+function fallingDown() {
+    if( floorPos_y != gameChar_y ) {
+        var rateOfDrop = 2;
+        gameChar_y += rateOfDrop;
+        isFalling = true;
+    } else if( isPlummeting && floorPos_y == gameChar_y ) {
+        isFalling = false;
+        var rateOfDrop = 15;
+        gameChar_y += rateOfDrop;
+    } else {
+        isFalling = false;
+    }
+}
 
 function keyPressed()
 {
@@ -249,4 +338,28 @@ function wait(ms){
    while(end < start + ms) {
      end = new Date().getTime();
   }
+}
+
+function getCollectable() {
+    push();
+    fill(255,255,120);
+//    translate(width*0.1, height*0,1);
+//    rotate(frameCount / -100.0);
+    star(collectable.x_pos, collectable.y_pos, collectable.size, collectable.length, 5);
+    pop();
+}
+
+function star(x, y, radius1, radius2, npoints) {
+  let angle = TWO_PI / npoints;
+  let halfAngle = angle / 2.0;
+  beginShape();
+  for (let a = 0; a < TWO_PI; a += angle) {
+    let sx = x + cos(a) * radius2;
+    let sy = y + sin(a) * radius2;
+    vertex(sx, sy);
+    sx = x + cos(a + halfAngle) * radius1;
+    sy = y + sin(a + halfAngle) * radius1;
+    vertex(sx, sy);
+  }
+  endShape(CLOSE);
 }
